@@ -1,0 +1,41 @@
+﻿<!DOCTYPE html>
+<html>
+
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Spring与SpringMvc之父子容器</title>
+  <link rel="stylesheet" href="https://stackedit.io/style.css" />
+</head>
+
+<body class="stackedit">
+  <div class="stackedit__html"><p></p><div class="toc"><h3>文章目录</h3><ul><ul><ul><li><a href="#springweb_1">springweb项目配置文件</a></li><li><a href="#_7">父子容器介绍</a></li><li><a href="#_16">父子容器相关问题</a></li><ul><li><a href="#springspringmvc_17">spring和springmvc中为什么要有父子容器？</a></li><li><a href="#springmvc_19">springmvc可以只有一个容器？</a></li><li><a href="#_21">父子容器可以解决哪种业务场景？</a></li></ul></ul></ul></ul></div><p></p>
+<h3><a id="springweb_1"></a>springweb项目配置文件</h3>
+<p><img src="https://img-blog.csdnimg.cn/20200714184224219.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3FxXzM4NDI1ODAz,size_16,color_FFFFFF,t_70" alt="在这里插入图片描述"><br>
+由图可见，springweb项目中创建了2个WebApplicationContext，分别是spring创建的容器applicationContext.xml和springmvc创建的dispatcher-servlet.xml。<br>
+<strong>作用</strong>：<br>
+<strong>springmvc&nbsp;&nbsp;&nbsp;dispatcher-servlet.xml</strong>：在MVC三层模型中的controller控制层中，与视图解析器ViewReslover，HandlerMapping处理器映射器等打交道，用于前后端交互<br>
+<strong>spring&nbsp;&nbsp;&nbsp;applicationContext.xml</strong>：在MVC三层模型中的service业务层和Dao持久层中，管理bean的注入以及bean所相关依赖对象的注入</p>
+<h3><a id="_7"></a>父子容器介绍</h3>
+<p>springmvc初始化容器的时候会在这个容器指定一个父容器，也就是spring创建的容器。<br>
+<img src="https://img-blog.csdnimg.cn/2020071419273894.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3FxXzM4NDI1ODAz,size_16,color_FFFFFF,t_70" alt="在这里插入图片描述"><br>
+<strong>父子容器特点：</strong></p>
+<blockquote>
+<p><strong>1.父容器和子容器是相互隔离的，他们内部可以存在名称相同的bean</strong><br>
+<strong>2.子容器可以访问父容器中的bean，而父容器不能访问子容器中的bean</strong><br>
+<strong>3.调用子容器的getBean方法获取bean的时候，会沿着当前容器开始向上面的容器进行查找，直到找到对应的bean为止</strong><br>
+<strong>4.子容器中可以通过任何注入方式注入父容器中的bean，而父容器中是无法注入子容器中的bean，原因是第2点</strong></p>
+</blockquote>
+<h3><a id="_16"></a>父子容器相关问题</h3>
+<h4><a id="springspringmvc_17"></a>spring和springmvc中为什么要有父子容器？</h4>
+<p>基于spring父容器不能访问springmvc容器里面的bean特点，可以达到隔离解耦，区分框架边界的目的。避免service层注入controller层的bean导致结构混乱</p>
+<h4><a id="springmvc_19"></a>springmvc可以只有一个容器？</h4>
+<p>可以只使用一个容器：SpringMVC容器。这个容器里配置所有的bean</p>
+<h4><a id="_21"></a>父子容器可以解决哪种业务场景？</h4>
+<p>场景：公司A与公司B合作，公司A项目依赖公司B项目的jar包，此时A项目和依赖的B项目jar包同时拥有很多相同名称的bean，此时就会报错bean名称重复，那么此刻父子容器就可以解决这个问题。<br>
+解决方式：A作为子容器，B作为父容器，就不用去手动更改N个相同名称的bean</p>
+<p>参考博文：<a href="https://blog.csdn.net/likun557/article/details/105608851">https://blog.csdn.net/likun557/article/details/105608851</a></p>
+</div>
+</body>
+
+</html>
