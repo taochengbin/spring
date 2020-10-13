@@ -1,0 +1,6 @@
+server:
+  port: 4444
+  servlet:
+    context-path: /
+  compression:
+    enabled: true

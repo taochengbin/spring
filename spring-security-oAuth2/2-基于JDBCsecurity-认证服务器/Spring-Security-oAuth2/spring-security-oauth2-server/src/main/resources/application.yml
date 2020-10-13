@@ -1,0 +1,56 @@
+spring:
+  application:
+    name: oauth2-server
+  security:
+    user:
+      # 账号
+      name: root
+      # 密码
+      password: 123456
+  datasource:
+    druid:
+      driver-class-name: oracle.jdbc.OracleDriver
+      url: jdbc:oracle:thin:@192.168.43.221:1521:ORCL
+      username: scott
+      password: 12345
+      initial-size: 5
+      min-idle: 10
+      max-active: 1000
+      max-pool-prepared-statement-per-connection-size: -1
+      max-wait: 60000
+      async-init: true
+      time-between-eviction-runs-millis: 2000
+      min-evictable-idle-time-millis: 300000
+      validation-query: SELECT 1 FROM DUAL
+      test-while-idle: true
+      test-on-borrow: false
+      test-on-return: false
+      keep-alive: true
+      connect-properties:
+        config:
+          decrypt: false
+      filter:
+        slf4j:
+          enabled: true
+          statement-log-error-enabled: false
+        stat:
+          enabled: true
+          log-slow-sql: true
+          slow-sql-millis: 2000
+        config:
+          enabled: true
+      use-global-data-source-stat: true
+      web-stat-filter:
+        enabled: false
+      stat-view-servlet:
+        enabled: true
+        url-pattern: /druid/*
+        login-username: admin
+        login-password: admin
+        allow: 127.0.0.1
+        reset-enable: true
+
+server:
+  port: 8080
+
+
