@@ -1,0 +1,70 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:context="http://www.springframework.org/schema/context"
+       xmlns:mvc="http://www.springframework.org/schema/mvc" xmlns:aop="http://www.springframework.org/schema/aop"
+       xmlns:tx="http://www.springframework.org/schema/tx" xmlns:amq="http://activemq.apache.org/schema/core"
+       xmlns:task="http://www.springframework.org/schema/task"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-4.0.xsd
+        http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-4.0.xsd
+        http://www.springframework.org/schema/mvc http://www.springframework.org/schema/mvc/spring-mvc-4.0.xsd
+        http://www.springframework.org/schema/tx http://www.springframework.org/schema/tx/spring-tx-4.0.xsd
+        http://www.springframework.org/schema/aop http://www.springframework.org/schema/aop/spring-aop-4.0.xsd
+        http://activemq.apache.org/schema/core http://activemq.apache.org/schema/core/activemq-core.xsd
+        http://www.springframework.org/schema/task http://www.springframework.org/schema/task/spring-task-4.0.xsd">
+
+
+  <bean id="dataSource" class="org.apache.commons.dbcp.BasicDataSource">
+    <property name="driverClassName" value="com.mysql.jdbc.Driver" />
+    <property name="url" value="jdbc:mysql://192.168.43.221:3306/quartz" />
+    <property name="username" value="root" />
+    <property name="password" value="123456" />
+  </bean>
+
+  <!--SessionFactory配置-->
+  <bean id="sessionFactory" class="org.springframework.orm.hibernate3.LocalSessionFactoryBean" destroy-method="destroy">
+    <property name="dataSource" ref="dataSource"/>
+    <property name="mappingResources">
+      <list>
+        <value>com/demo/model/UserEntity.hbm.xml</value>
+      </list>
+    </property>
+    <property name="hibernateProperties">
+      <props>
+        <prop key="hibernate.dialect">org.hibernate.dialect.MySQL5Dialect</prop>
+        <prop key="hibernate.show_sql">false</prop>
+      </props>
+    </property>
+  </bean>
+
+  <bean id="userDao" class="com.demo.dao.UserDao">
+    <property name="sessionFactory" ref="sessionFactory"></property>
+  </bean>
+
+  <bean id="test" class="com.demo.action.TestAction">
+    <property name="userService" ref="userService"></property>
+  </bean>
+
+  <bean id="userService" class="com.demo.service.impl.UserServiceImpl">
+    <property name="userDao" ref="userDao"></property>
+  </bean>
+
+  <bean id="transactionManager" class="org.springframework.jdbc.datasource.DataSourceTransactionManager">
+    <property name="dataSource" ref="dataSource"></property>
+  </bean>
+  <!-- 定义事务通知 -->
+  <tx:advice id="txAdvice" transaction-manager="transactionManager">
+    <!-- 定义方法的过滤规则 -->
+    <tx:attributes>
+      <!-- 所有方法都使用事务 -->
+      <tx:method name="*" propagation="REQUIRED"/>
+    </tx:attributes>
+  </tx:advice>
+  <!-- 定义AOP配置 -->
+  <aop:config>
+    <!-- 定义一个切入点 -->
+    <aop:pointcut expression="execution (* com.demo.service.*.*(..))" id="services"/>
+    <!-- 对切入点和事务的通知，进行适配 -->
+    <aop:advisor advice-ref="txAdvice" pointcut-ref="services"/>
+  </aop:config>
+
+</beans>

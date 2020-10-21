@@ -1,0 +1,5 @@
+com\demo\dao\UserDao.class
+com\demo\model\UserEntity.class
+com\demo\action\TestAction.class
+com\demo\service\UserService.class
+com\demo\service\impl\UserServiceImpl.class
